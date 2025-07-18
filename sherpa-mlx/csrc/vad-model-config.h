@@ -16,7 +16,6 @@ struct VadModelConfig {
   SileroVadModelConfig silero_vad;
 
   int32_t sample_rate = 16000;
-  int32_t num_threads = 1;
 
   // true to show debug information when loading models
   bool debug = false;

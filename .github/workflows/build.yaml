@@ -58,11 +58,6 @@ jobs:
           echo "---"
           ls -lh $(python3 -m mlx --cmake-dir)/include/mlx
 
-      - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
       - name: Build
         shell: bash
         run: |

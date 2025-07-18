@@ -62,7 +62,7 @@ modernize-*,
 performance-*,
 readability-container-size-empty,
 readability-delete-null-pointer,
-readability-duplicate-include
+readability-duplicate-include,
 readability-misplaced-array-index,
 readability-redundant-function-ptr-dereference,
 readability-redundant-smartptr-get,

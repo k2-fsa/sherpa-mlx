@@ -1,14 +1,20 @@
 set(sources
+  file-utils.cc
   parse-options.cc
+  silero-vad-model-config.cc
+  silero-vad-model.cc
   text-utils.cc
+  vad-model-config.cc
+  vad-model.cc
 )
 
 # Always static build
 add_library(sherpa-mlx-core STATIC ${sources})
 target_include_directories(
   sherpa-mlx-core
-  PUBLIC
+  PRIVATE
     ${PROJECT_SOURCE_DIR}
+    $ENV{MLX_CMAKE_DIR}/include
 )
 
 set_target_properties(
@@ -18,6 +24,13 @@ set_target_properties(
     C_VISIBILITY_PRESET hidden
     CXX_VISIBILITY_PRESET hidden
 )
+
+target_link_libraries(
+  sherpa-mlx-core
+  PRIVATE
+  -L$ENV{MLX_CMAKE_DIR}/lib
+  -lmlx
+  )
 
 set(srcs_to_check)
 foreach(s IN LISTS sources)

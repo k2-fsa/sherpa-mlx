@@ -21,6 +21,12 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
 endif()
 
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17 CACHE STRING "The C++ version to be used.")
+endif()
+set(CMAKE_CXX_EXTENSIONS OFF)
+message(STATUS "C++ Standard version: ${CMAKE_CXX_STANDARD}")
+
 option(BUILD_SHARED_LIBS "Whether to build shared libraries" OFF)
 
 
@@ -64,5 +70,19 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(show-info)
+
+if(NOT DEFINED ENV{MLX_CMAKE_DIR})
+    message(FATAL_ERROR "\
+MLX_CMAKE_DIR not defined.
+1. Install mlx with
+  pip install mlx
+2. Use
+  python3 -m mlx --cmake-dir
+to find the directory of mlx
+3. Use
+  export MLX_CMAKE_DIR=$(python3 -m mlx --cmake-dir)
+4. Re-try the failed command
+  ")
+endif()
 
 add_subdirectory(sherpa-mlx)

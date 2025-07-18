@@ -1,0 +1,70 @@
+# Copyright (c)  2025  Xiaomi Corporation
+name: upload_models
+
+on:
+  push:
+    branches:
+      - upload-models
+
+  workflow_dispatch:
+
+concurrency:
+  group: upload_models-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vad:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set git config
+        shell: bash
+        run: |
+          git config --global user.email "csukuangfj@gmail.com"
+          git config --global user.name "Fangjun Kuang"
+
+      - name: Upload silero-vad v4 to huggingface space and modelscope space
+        shell: bash
+        env:
+          MS_TOKEN: ${{ secrets.MS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+          export GIT_LFS_SKIP_SMUDGE=1
+          export GIT_CLONE_PROTECTION_ACTIVE=false
+
+          git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models hf
+          git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models.git ms
+
+          for repo in ms hf; do
+            mkdir -p $repo/vad
+            cp -v silero-vad-v4.mlxfn $repo/vad
+            pushd $repo/vad
+            git status .
+            git lfs track "*.mlxfn"
+            git add .
+            git commit -m 'add silero-vad-v4' || true
+
+            if [ $repo == hf ]; then
+              git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models || true
+            fi
+
+            if [ $repo == ms ]; then
+              git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models || true
+            fi
+            popd
+          done
+

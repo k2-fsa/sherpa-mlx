@@ -1,4 +1,5 @@
 set(sources
+  circular-buffer.cc
   file-utils.cc
   parse-options.cc
   silero-vad-model-config.cc
@@ -6,6 +7,7 @@ set(sources
   text-utils.cc
   vad-model-config.cc
   vad-model.cc
+  voice-activity-detector.cc
 )
 
 # Always static build

@@ -140,7 +140,7 @@ class SileroVadModel::Impl {
   void Init() {
     if (config_.sample_rate != 16000) {
       SHERPA_MLX_LOGE("Expected sample rate 16000. Given: %d",
-                      config.sample_rate);
+                      config_.sample_rate);
       SHERPA_MLX_EXIT(-1);
     }
 

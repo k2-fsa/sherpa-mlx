@@ -1,11 +1,11 @@
 # Copyright (c)  2025  Xiaomi Corporation
-name: style_check
+name: build
 
 on:
   push:
     branches:
       - master
-      - ci
+      - silero-vad
 
   pull_request:
     branches:
@@ -14,14 +14,16 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: style_check-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  style_check:
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: ["ubuntu-latest", "macos-latest"]
         python-version: ["3.10"]
       fail-fast: false
 
@@ -35,37 +37,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Check style with cpplint
-        shell: bash
-        working-directory: ${{github.workspace}}
-        run: ./scripts/check_style_cpplint.sh
-
-  clang-tidy:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10"]
-      fail-fast: false
-
-    steps:
-      - uses: actions/checkout@v4
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
-          fetch-depth: 0
-
-      - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install clang-tidy
-        shell: bash
-        run: |
-          pip install clang-tidy
+          key: ${{ matrix.os }}
 
       - name: Install mlx
         shell: bash
         run: |
-          pip install mlx
+          python3 -m pip install mlx
 
       - name: Show mlx
         shell: bash
@@ -78,16 +58,23 @@ jobs:
           echo "---"
           ls -lh $(python3 -m mlx --cmake-dir)/include/mlx
 
-      - name: Configure
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build
         shell: bash
         run: |
+          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cmake --version
+
+          export MLX_CMAKE_DIR=$(python3 -m mlx --cmake-dir)
+
           mkdir build
           cd build
-          export MLX_CMAKE_DIR=$(python3 -m mlx --cmake-dir)
-          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+          cmake ..
+          make VERBOSE=1
 
-      - name: Check with clang-tidy
-        shell: bash
-        run: |
-          cd build
-          make check
+          ls -lh lib

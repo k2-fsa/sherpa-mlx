@@ -2,10 +2,6 @@
 BasedOnStyle: Google
 ---
 Language:               Cpp
-Cpp11BracedListStyle:   true
-Standard:               Cpp11
-DerivePointerAlignment: false
-PointerAlignment:       Right
 ---
 Language: Java
 JavaImportGroups: [ 'java', 'javax', 'javafx', 'org', 'io', 'com', 'de.gsi' ]
@@ -55,7 +51,7 @@ CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 8
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat: false
 ExperimentalAutoDetectBinPacking: false

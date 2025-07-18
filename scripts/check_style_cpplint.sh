@@ -38,7 +38,7 @@ cpplint_src=$build_dir/cpplint-${cpplint_version}/cpplint.py
 if [ ! -d "$build_dir/cpplint-${cpplint_version}" ]; then
   pushd $build_dir
   if command -v wget &> /dev/null; then
-    wget https://github.com/cpplint/cpplint/archive/${cpplint_version}.tar.gz
+    wget -qq https://github.com/cpplint/cpplint/archive/${cpplint_version}.tar.gz
   elif command -v curl &> /dev/null; then
     curl -O -SL https://github.com/cpplint/cpplint/archive/${cpplint_version}.tar.gz
   else

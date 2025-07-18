@@ -34,7 +34,12 @@ if(UNIX AND NOT APPLE)
     lsb_release -sd
     OUTPUT_VARIABLE SHERPA_MLX_OS
     OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    RESULT_VARIABLE LSB_RESULT
   )
+  if(NOT LSB_RESULT EQUAL 0)
+    set(SHERPA_MLX_OS "${CMAKE_SYSTEM}")
+  endif()
 elseif(APPLE)
   execute_process(COMMAND
     sw_vers -productName

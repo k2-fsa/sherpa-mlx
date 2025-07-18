@@ -13,10 +13,9 @@
 #include <vector>
 
 #ifdef _MSC_VER
-#define SHERPA_MLX_STRTOLL(cur_cstr, end_cstr) \
-  _strtoi64(cur_cstr, end_cstr, 10);
+#define SHERPA_MLX_STRTOLL(cur_cstr, end_cstr) _strtoi64(cur_cstr, end_cstr, 10)
 #else
-#define SHERPA_MLX_STRTOLL(cur_cstr, end_cstr) strtoll(cur_cstr, end_cstr, 10);
+#define SHERPA_MLX_STRTOLL(cur_cstr, end_cstr) strtoll(cur_cstr, end_cstr, 10)
 #endif
 
 // This file is copied/modified from

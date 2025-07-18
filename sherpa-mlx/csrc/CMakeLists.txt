@@ -1,5 +1,3 @@
-include_directories(${PROJECT_SOURCE_DIR})
-
 set(sources
   parse-options.cc
   text-utils.cc
@@ -7,6 +5,11 @@ set(sources
 
 # Always static build
 add_library(sherpa-mlx-core STATIC ${sources})
+target_include_directories(
+  sherpa-mlx-core
+  PUBLIC
+    ${PROJECT_SOURCE_DIR}
+)
 
 set_target_properties(
     sherpa-mlx-core

@@ -90,7 +90,7 @@ bool SplitStringToIntegers(const std::string &full, const char *delim,
   out->resize(split.size());
   for (size_t i = 0; i < split.size(); i++) {
     const char *this_str = split[i].c_str();
-    char *end = NULL;
+    char *end = nullptr;
     int64_t j = 0;
     j = SHERPA_MLX_STRTOLL(this_str, &end);
     if (end == this_str || *end != '\0') {

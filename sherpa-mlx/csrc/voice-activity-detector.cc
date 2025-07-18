@@ -253,13 +253,13 @@ const VadModelConfig &VoiceActivityDetector::GetConfig() const {
 #if __ANDROID_API__ >= 9
 template VoiceActivityDetector::VoiceActivityDetector(
     AAssetManager *mgr, const VadModelConfig &config,
-    float buffer_size_in_seconds = 60);
+    float buffer_size_in_seconds /*= 60*/);
 #endif
 
 #if __OHOS__
 template VoiceActivityDetector::VoiceActivityDetector(
     NativeResourceManager *mgr, const VadModelConfig &config,
-    float buffer_size_in_seconds = 60);
+    float buffer_size_in_seconds /*= 60*/);
 #endif
 
 }  // namespace sherpa_mlx

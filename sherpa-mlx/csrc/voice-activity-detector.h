@@ -17,6 +17,7 @@ struct SpeechSegment {
   std::vector<float> samples;
 };
 
+// this class is not thread-safe
 class VoiceActivityDetector {
  public:
   explicit VoiceActivityDetector(const VadModelConfig &config,
@@ -44,11 +45,11 @@ class VoiceActivityDetector {
   // It is empty if IsSpeechDetected() returns false
   SpeechSegment CurrentSpeechSegment() const;
 
-  void Reset() const;
+  void Reset();
 
   // At the end of the utterance, you can invoke this method so that
   // the last speech segment can be detected.
-  void Flush() const;
+  void Flush();
 
   const VadModelConfig &GetConfig() const;
 

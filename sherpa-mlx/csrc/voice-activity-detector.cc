@@ -234,9 +234,9 @@ const SpeechSegment &VoiceActivityDetector::Front() const {
   return impl_->Front();
 }
 
-void VoiceActivityDetector::Reset() const { impl_->Reset(); }
+void VoiceActivityDetector::Reset() { impl_->Reset(); }
 
-void VoiceActivityDetector::Flush() const { impl_->Flush(); }
+void VoiceActivityDetector::Flush() { impl_->Flush(); }
 
 bool VoiceActivityDetector::IsSpeechDetected() const {
   return impl_->IsSpeechDetected();

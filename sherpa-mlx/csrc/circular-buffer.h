@@ -13,7 +13,8 @@ namespace sherpa_mlx {
 class CircularBuffer {
  public:
   // Capacity of this buffer. Should be large enough.
-  // If it is full, we just print a message and exit the program.
+  // If it is full, it resizes the buffer, copying the old data.
+  // No data loss on buffer overflow.
   explicit CircularBuffer(int32_t capacity);
 
   // Push an array
@@ -21,7 +22,8 @@ class CircularBuffer {
   // @param p Pointer to the start address of the array
   // @param n Number of elements in the array
   //
-  // Note: If n + Size() > capacity, we print an error message and exit.
+  // Note: If n + Size() > capacity, it resizes the buffer automagically.
+  // No data loss on buffer overflow.
   void Push(const float *p, int32_t n);
 
   // @param start_index Should in the range [head_, tail_)

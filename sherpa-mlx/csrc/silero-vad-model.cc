@@ -195,8 +195,8 @@ class SileroVadModel::Impl {
 
  private:
   VadModelConfig config_;
-  int32_t min_silence_samples_;
-  int32_t min_speech_samples_;
+  int32_t min_silence_samples_ = 0;
+  int32_t min_speech_samples_ = 0;
 
   bool triggered_ = false;
   int32_t current_sample_ = 0;

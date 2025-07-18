@@ -28,27 +28,13 @@ namespace sherpa_mlx {
 
 class SileroVadModel::Impl {
  public:
-  explicit Impl(const VadModelConfig &config) : config_(config) {
-    if (config_.sample_rate != 16000) {
-      SHERPA_MLX_LOGE("Expected sample rate 16000. Given: %d",
-                      config.sample_rate);
-      SHERPA_MLX_EXIT(-1);
-    }
-
-    min_silence_samples_ =
-        config_.sample_rate * config_.silero_vad.min_silence_duration;
-
-    min_speech_samples_ =
-        config_.sample_rate * config_.silero_vad.min_speech_duration;
-
-    model_ = std::make_unique<mx::ImportedFunction>(
-        mx::import_function(config_.silero_vad.model));
-
-    Reset();
-  }
+  explicit Impl(const VadModelConfig &config) : config_(config) { Init(); }
 
   template <typename Manager>
   Impl(Manager *mgr, const VadModelConfig &config) : config_(config) {
+    Init();
+
+    // We need to read the model from asset
     SHERPA_MLX_LOGE("Not implemented yet");
     SHERPA_MLX_EXIT(-1);
   }
@@ -151,6 +137,25 @@ class SileroVadModel::Impl {
   }
 
  private:
+  void Init() {
+    if (config_.sample_rate != 16000) {
+      SHERPA_MLX_LOGE("Expected sample rate 16000. Given: %d",
+                      config.sample_rate);
+      SHERPA_MLX_EXIT(-1);
+    }
+
+    min_silence_samples_ =
+        config_.sample_rate * config_.silero_vad.min_silence_duration;
+
+    min_speech_samples_ =
+        config_.sample_rate * config_.silero_vad.min_speech_duration;
+
+    model_ = std::make_unique<mx::ImportedFunction>(
+        mx::import_function(config_.silero_vad.model));
+
+    Reset();
+  }
+
   void ResetV4() {
     if (states_.empty()) {
       states_.reserve(4);

@@ -51,7 +51,7 @@ class SileroVadModel::Impl {
   bool IsSpeech(const float *samples, int32_t n) {
     if (n != WindowSize()) {
       SHERPA_MLX_LOGE("n: %d != window_size: %d", n, WindowSize());
-      exit(-1);
+      SHERPA_MLX_EXIT(-1);
     }
 
     float prob = Run(samples, n);

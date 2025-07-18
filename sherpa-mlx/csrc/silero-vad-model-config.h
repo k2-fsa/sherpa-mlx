@@ -1,6 +1,7 @@
 // sherpa-mlx/csrc/silero-vad-model-config.h
 //
-// Copyright (c)  2023  Xiaomi Corporation
+// Copyright (c)  2025  Xiaomi Corporation
+
 #ifndef SHERPA_MLX_CSRC_SILERO_VAD_MODEL_CONFIG_H_
 #define SHERPA_MLX_CSRC_SILERO_VAD_MODEL_CONFIG_H_
 

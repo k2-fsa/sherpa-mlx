@@ -18,13 +18,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dispatch-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: set-matrix
+        run: |
+          python3 ./.github/scripts/generate_build_matrix.py
+          python3 ./.github/scripts/generate_build_matrix.py >> $GITHUB_OUTPUT
+          echo "here: $GITHUB_OUTPUT"
+          cat $GITHUB_OUTPUT
+
   build:
-    name: ${{ matrix.os }}
+    needs: dispatch-matrix
+    name: build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        os: ["ubuntu-latest", "macos-latest"]
-        python-version: ["3.10"]
+      matrix: ${{ fromJson(needs.dispatch-matrix.outputs.matrix) }}
       fail-fast: false
 
     steps:
@@ -45,7 +60,14 @@ jobs:
       - name: Install mlx
         shell: bash
         run: |
-          python3 -m pip install mlx==0.26.3
+          os=${{ matrix.os }}
+          if [[ $os == 'ubuntu-latest' ]]; then
+            python3 -m pip install mlx[cpu]
+          else
+            # python3 -m pip install mlx
+            curl -SL -O https://huggingface.co/csukuangfj/mlx-wheels/resolve/main/cpu/0.26.5/mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+            python3 -m pip install ./mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+          fi
 
       - name: Show mlx
         shell: bash
@@ -72,4 +94,124 @@ jobs:
           cmake ..
           make VERBOSE=1
 
+          ls -lh bin
+          echo "---"
           ls -lh lib
+
+      - name: View dependencies (ubuntu-latest)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          cd build/bin
+          readelf -d sherpa-mlx-vad
+          echo "---"
+          ldd sherpa-mlx-vad
+
+      - name: View dependencies (macos-latest)
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          cd build/bin
+          otool -L sherpa-mlx-vad
+          echo "---"
+          otool -l sherpa-mlx-vad
+
+      - name: Collect results
+        shell: bash
+        run: |
+          mv build/bin .
+          tar cjfv bin.tar.bz2 bin
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bin-${{ matrix.os }}
+          path: ./*.tar.bz2
+
+  test_vad:
+    needs: [dispatch-matrix, build]
+    name: vad ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: ${{ fromJson(needs.dispatch-matrix.outputs.matrix) }}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install mlx
+        shell: bash
+        run: |
+          os=${{ matrix.os }}
+          if [[ $os == 'ubuntu-latest' ]]; then
+            python3 -m pip install mlx[cpu]
+          else
+            # python3 -m pip install mlx
+            curl -SL -O https://huggingface.co/csukuangfj/mlx-wheels/resolve/main/cpu/0.26.5/mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+            python3 -m pip install ./mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+          fi
+
+      - name: Retrieve artifact from ${{ matrix.os }}
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-${{ matrix.os }}
+          path: ./build
+
+      - name: Show bin
+        shell: bash
+        run: |
+          cd build
+          ls -lh
+          tar xvf bin.tar.bz2
+          ls -lh bin
+
+      - name: Download test files
+        shell: bash
+        run: |
+          curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/lei-jun-test.wav
+          curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/Obama.wav
+          curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+
+      - name: Setup tmate session
+        # if: matrix.os == 'macos-latest'
+        if: false
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Run test (lei-jun)
+        shell: bash
+        run: |
+          ./build/bin/sherpa-mlx-vad \
+            --silero-vad-model=./silero-vad-v4.mlxfn \
+            ./lei-jun-test.wav \
+            ./lei-jun-test-no-silence.wav
+
+      - name: Run test (Obama)
+        shell: bash
+        run: |
+          ./build/bin/sherpa-mlx-vad \
+            --silero-vad-model=./silero-vad-v4.mlxfn \
+            ./Obama.wav \
+            ./Obama-no-silence.wav
+
+      - name: Collect results
+        shell: bash
+        run: |
+          mv build/bin .
+          d=vad-test-results-${{ matrix.os }}
+          mkdir $d
+          cp -v *.wav $d
+          tar cjvf $d.tar.bz2 $d
+
+          ls -lh *.wav
+          ls -lh *.tar.bz2
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vad-test-${{ matrix.os }}
+          path: ./*.tar.bz2

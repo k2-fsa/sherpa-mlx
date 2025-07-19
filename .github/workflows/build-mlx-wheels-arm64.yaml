@@ -1,0 +1,85 @@
+name: mlx-wheels-arm64
+
+on:
+  push:
+    branches:
+      - sherpa-mlx-vad
+
+jobs:
+  macos-mlx-wheel-arm64:
+    if: true
+    name: ${{ matrix.python-version }} ${{ matrix.mlx-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+        python-version: ["cp39", "cp310", "cp311", "cp312", "cp313"]
+        mlx-version: ["0.26.3", "0.26.5"]
+
+    steps:
+      - name: Download mlx
+        shell: bash
+        run: |
+          git clone --depth 1 --branch v${{ matrix.mlx-version }} https://github.com/ml-explore/mlx mlx-2
+          mv mlx-2/* ./
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          CIBW_BUILD: "${{ matrix.python-version}}-* "
+          CIBW_ENVIRONMENT: CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES='arm64' -DMLX_BUILD_METAL=OFF -DMLX_BUILD_GGUF=ON -DMLX_BUILD_SAFETENSORS=ON -DCMAKE_BUILD_TYPE=Release"  PYPI_RELEASE=1
+          CIBW_ARCHS: "arm64"
+          CIBW_BUILD_VERBOSITY: 3
+
+          #  Don't repair macOS wheels
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
+
+      - name: Display wheels
+        shell: bash
+        run: |
+          ls -lh ./wheelhouse/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.python-version }}-mlx-${{ matrix.mlx-version }}
+          path: ./wheelhouse/*.whl
+
+      - name: Set git config
+        shell: bash
+        run: |
+          git config --global user.email "csukuangfj@gmail.com"
+          git config --global user.name "Fangjun Kuang"
+
+      - name: Upload mlx wheels to huggingface space and modelscope space
+        shell: bash
+        env:
+          MS_TOKEN: ${{ secrets.MS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          export GIT_LFS_SKIP_SMUDGE=1
+          export GIT_CLONE_PROTECTION_ACTIVE=false
+
+          git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/mlx-wheels hf
+          git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/mlx-wheels.git ms
+
+          d=cpu/${{ matrix.mlx-version }}
+
+          for repo in ms hf; do
+            mkdir -p $repo/$d
+            cp -v wheelhouse/*.whl  $repo/$d
+            pushd $repo/
+            git status .
+            git lfs track "*.whl"
+            git add .
+            git commit -m "add mlx ${{ matrix.mlx-version }}" || true
+
+            if [ $repo == hf ]; then
+              git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/mlx-wheels || true
+            fi
+
+            if [ $repo == ms ]; then
+              git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/mlx-wheels || true
+            fi
+            popd
+          done

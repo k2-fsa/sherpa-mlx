@@ -197,8 +197,18 @@ class SileroVadModel::Impl {
     }
 
     SHERPA_MLX_LOGE("iii %d", (int)states_.size());
+
+    SHERPA_MLX_LOGE("herek0 %d", (int)inputs[0].size());
+    SHERPA_MLX_LOGE("herek1 %d", (int)inputs[1].size());
+    SHERPA_MLX_LOGE("herek2 %d", (int)inputs[2].size());
+    SHERPA_MLX_LOGE("herek3 %d", (int)inputs[3].size());
+
     std::vector<mx::array> outputs = (*model_)(inputs);
-    SHERPA_MLX_LOGE("here%d", (int)outputs.size());
+    SHERPA_MLX_LOGE("here %d", (int)outputs.size());
+    SHERPA_MLX_LOGE("here0 %d", (int)outputs[0].size());
+    SHERPA_MLX_LOGE("here1 %d", (int)outputs[1].size());
+    SHERPA_MLX_LOGE("here2 %d", (int)outputs[2].size());
+    SHERPA_MLX_LOGE("here3 %d", (int)outputs[3].size());
     for (auto &o : outputs) {
       SHERPA_MLX_LOGE("here");
       mx::eval(o);

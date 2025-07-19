@@ -158,9 +158,10 @@ class SileroVadModel::Impl {
 
   void ResetV4() {
     if (states_.empty()) {
+      std::vector<float> tmp(64);
       states_.reserve(4);
       for (int32_t i = 0; i != 4; ++i) {
-        mx::array s({1, 64}, mx::float32);
+        mx::array s(tmp.data(), {1, 64});
         states_.push_back(std::move(s));
       }
     }

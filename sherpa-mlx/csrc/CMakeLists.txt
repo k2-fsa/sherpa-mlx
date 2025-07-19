@@ -36,8 +36,21 @@ target_link_libraries(
   -lmlx
   )
 
+if(UNIX AND NOT APPLE)
+  # It works on GitHub actions without linking to pthread or dl
+  # but it fails on my ubuntu
+  find_package(Threads REQUIRED)
+  target_link_libraries(sherpa-mlx-core
+    PUBLIC
+      Threads::Threads
+      dl
+  )
+endif()
+
 add_executable(sherpa-mlx-vad sherpa-mlx-vad.cc)
+
 target_link_libraries(sherpa-mlx-vad sherpa-mlx-core)
+target_link_libraries(sherpa-mlx-vad "-Wl,-rpath,$ENV{MLX_CMAKE_DIR}/lib")
 
 set(srcs_to_check)
 foreach(s IN LISTS sources)

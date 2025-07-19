@@ -5,6 +5,7 @@
 #include "sherpa-mlx/csrc/silero-vad-model.h"
 
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -204,15 +205,15 @@ class SileroVadModel::Impl {
     SHERPA_MLX_LOGE("herek3 %d", (int)inputs[3].size());
 
     std::vector<mx::array> outputs = (*model_)(inputs);
+    SHERPA_MLX_LOGE("here");
+    mx::eval(outputs);
+
     SHERPA_MLX_LOGE("here %d", (int)outputs.size());
     SHERPA_MLX_LOGE("here0 %d", (int)outputs[0].size());
     SHERPA_MLX_LOGE("here1 %d", (int)outputs[1].size());
     SHERPA_MLX_LOGE("here2 %d", (int)outputs[2].size());
     SHERPA_MLX_LOGE("here3 %d", (int)outputs[3].size());
-    for (auto &o : outputs) {
-      SHERPA_MLX_LOGE("here");
-      mx::eval(o);
-    }
+
     // SHERPA_MLX_LOGE("kkk %d", (int)outputs.size());
     // SHERPA_MLX_LOGE("outputs0 %d", (int)outputs[0].size());
     SHERPA_MLX_LOGE("outputs %p", outputs[0].data<float>());

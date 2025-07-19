@@ -197,9 +197,12 @@ class SileroVadModel::Impl {
     std::vector<mx::array> outputs = (*model_)(inputs);
     SHERPA_MLX_LOGE("kkk %d", (int)outputs.size());
     float prob = outputs[0].item<float>();
+    SHERPA_MLX_LOGE("here");
     for (int32_t i = 0; i != states_.size(); ++i) {
+      SHERPA_MLX_LOGE("here i %d", i);
       states_[i] = std::move(outputs[i + 1]);
     }
+    SHERPA_MLX_LOGE("here");
 
     return prob;
   }

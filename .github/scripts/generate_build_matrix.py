@@ -8,7 +8,6 @@ def main():
     ans = {"os": os_list, "python-version": python_list}
 
     print(f"matrix={json.dumps(ans)}")
-    print(f"matrix={ans}")
 
 
 if __name__ == "__main__":

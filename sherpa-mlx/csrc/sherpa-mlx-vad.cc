@@ -17,16 +17,24 @@ int32_t main(int32_t argc, char *argv[]) {
 This program shows how to use VAD in sherpa-mlx
 to remove silences from a file.
 
-  ./bin/sherpa-mlx-vad \
+  ./build/bin/sherpa-mlx-vad \
     --silero-vad-model=/path/to/silero-vad-v4.mlxfn \
     /path/to/input.wav
     /path/to/output.wav
 
 Please download silero-vad-v4.mlxfn from
-https://github.com/k2-fsa/sherpa-mlx/releases/edit/vad-models
+
+  https://github.com/k2-fsa/sherpa-mlx/releases/vad-models
 
 For instance, use
-wget https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+
+  wget https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+  wget https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/lei-jun-test.wav
+
+  ./build/bin/sherpa-mlx-vad \
+    --silero-vad-model=./silero-vad-v4.mlxfn \
+    ./lei-jun-test.wav \
+    ./lei-jun-test-no-silence.wav
 
 input.wav should be 16kHz.
 )usage";

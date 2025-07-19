@@ -64,7 +64,8 @@ jobs:
           if [[ $os == 'ubuntu-latest' ]]; then
             python3 -m pip install mlx[cpu]
           else
-            python3 -m pip install mlx
+            # python3 -m pip install mlx
+            python3 -m pip install mlx==0.26.3
           fi
 
       - name: Show mlx
@@ -150,7 +151,8 @@ jobs:
           if [[ $os == 'ubuntu-latest' ]]; then
             python3 -m pip install mlx[cpu]
           else
-            python3 -m pip install mlx
+            # python3 -m pip install mlx
+            python3 -m pip install mlx==0.26.3
           fi
 
       - name: Retrieve artifact from ${{ matrix.os }}

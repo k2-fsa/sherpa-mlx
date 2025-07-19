@@ -18,13 +18,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dispatch-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: set-matrix
+        run: |
+          python3 ./.github/scripts/generate_build_matrix.py
+          python3 ./.github/scripts/generate_build_matrix.py >> $GITHUB_OUTPUT
+          echo "here: $GITHUB_OUTPUT"
+          cat $GITHUB_OUTPUT
+
   build:
+    needs: dispatch-matrix
     name: build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        os: ["ubuntu-latest", "macos-latest"]
-        python-version: ["3.10"]
+      matrix: ${{ fromJson(needs.dispatch-matrix.outputs.matrix) }}
       fail-fast: false
 
     steps:
@@ -106,13 +121,11 @@ jobs:
           path: ./*.tar.bz2
 
   test_vad:
-    needs: [build]
+    needs: [dispatch-matrix, build]
     name: vad ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        os: ["ubuntu-latest", "macos-latest"]
-        python-version: ["3.10"]
+      matrix: ${{ fromJson(needs.dispatch-matrix.outputs.matrix) }}
       fail-fast: false
 
     steps:
@@ -134,12 +147,17 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bin-${{ matrix.os }}
-          path: /tmp/build
+          path: ./build
 
       - name: Show bin
         shell: bash
         run: |
-          cd /tmp/build
+          cd build
           ls -lh
           tar xvf bin.tar.bz2
           ls -lh bin
+
+      - name: Run test
+        shell: bash
+        run: |
+          ./build/bin/sherpa-mlx-vad --help

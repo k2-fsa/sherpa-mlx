@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.os }}
+    name: build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -93,3 +93,53 @@ jobs:
           otool -L sherpa-mlx-vad
           echo "---"
           otool -l sherpa-mlx-vad
+
+      - name: Collect results
+        shell: bash
+        run: |
+          mv build/bin .
+          tar cjfv bin.tar.bz2 bin
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bin-${{ matrix.os }}
+          path: ./*.tar.bz2
+
+  test_vad:
+    needs: [build]
+    name: vad ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+        python-version: ["3.10"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install mlx
+        shell: bash
+        run: |
+          python3 -m pip install mlx==0.26.3
+
+      - name: Retrieve artifact from ${{ matrix.os }}
+        uses: actions/download-artifact@v4
+        with:
+          name: bin-${{ matrix.os }}
+          path: /tmp/build
+
+      - name: Show bin
+        shell: bash
+        run: |
+          cd /tmp/build
+          ls -lh
+          tar xvf bin.tar.bz2
+          ls -lh bin

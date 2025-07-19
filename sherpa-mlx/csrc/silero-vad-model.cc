@@ -162,7 +162,7 @@ class SileroVadModel::Impl {
       states_.reserve(4);
       for (int32_t i = 0; i != 4; ++i) {
         // mx::array s = mx::zeros({1, 64}, mx::float32);
-        mx::array s(tm.data(), {1, 64});
+        mx::array s(t.data(), {1, 64});
         states_.push_back(std::move(s));
       }
       return;

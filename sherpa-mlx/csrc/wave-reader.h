@@ -13,8 +13,9 @@ namespace sherpa_mlx {
 
 /** Read a wave file with expected sample rate.
 
-    @param filename Path to a wave file. It MUST be single channel, 16-bit
-                    PCM encoded.
+    @param filename Path to a wave file. Supports multi-channel WAV files
+                    with 8, 16, or 32-bit PCM (integer or floating-point)
+                    encoding. Only the first channel is returned.
     @param sampling_rate  On return, it contains the sampling rate of the file.
     @param is_ok On return it is true if the reading succeeded; false otherwise.
 

@@ -348,6 +348,10 @@ std::vector<float> ReadWave(std::istream &is, int32_t *sampling_rate,
         static_cast<int32_t>(samples.size()));
   }
 
+  if (!is_ok) {
+    return {};
+  }
+
   return samples[0];
 }
 

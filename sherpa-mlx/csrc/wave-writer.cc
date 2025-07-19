@@ -97,14 +97,16 @@ void WriteWave(char *buffer, int32_t sampling_rate, const float *samples_ch0,
 
   std::vector<int16_t> samples_int16_ch0(n);
   for (int32_t i = 0; i != n; ++i) {
-    samples_int16_ch0[i] = std::min<int32_t>(samples_ch0[i] * 32767, 32767);
+    samples_int16_ch0[i] =
+        std::clamp<int32_t>(samples_ch0[i] * 32767, -32768, 32767);
   }
 
   std::vector<int16_t> samples_int16_ch1;
   if (samples_ch1) {
     samples_int16_ch1.resize(n);
     for (int32_t i = 0; i != n; ++i) {
-      samples_int16_ch1[i] = std::min<int32_t>(samples_ch1[i] * 32767, 32767);
+      samples_int16_ch1[i] =
+          std::clamp<int32_t>(samples_ch1[i] * 32767, -32768, 32767);
     }
   }
 

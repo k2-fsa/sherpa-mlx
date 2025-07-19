@@ -42,6 +42,7 @@ input.wav should be 16kHz.
 
   namespace mx = mlx::core;
   mx::set_default_device(mx::Device::cpu);
+  mx::default_stream(mx::Device::cpu);
 
   sherpa_mlx::ParseOptions po(kUsageMessage);
   sherpa_mlx::VadModelConfig config;

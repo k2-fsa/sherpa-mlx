@@ -181,6 +181,7 @@ class SileroVadModel::Impl {
   float RunV4(const float *samples, int32_t n) {
     // SHERPA_MLX_LOGE("run with n %d", n);
     auto x = mx::array(samples, {1, n});
+    mx::eval(x);
 
     // SHERPA_MLX_LOGE("here");
     std::vector<mx::array> inputs;
@@ -189,13 +190,13 @@ class SileroVadModel::Impl {
     SHERPA_MLX_LOGE("here");
 
     inputs.push_back(std::move(x));
-    // SHERPA_MLX_LOGE("here");
+    SHERPA_MLX_LOGE("here");
 
     for (auto &s : states_) {
       inputs.push_back(std::move(s));
     }
 
-    // SHERPA_MLX_LOGE("iii %d", (int)states_.size());
+    SHERPA_MLX_LOGE("iii %d", (int)states_.size());
     std::vector<mx::array> outputs = (*model_)(inputs);
     for (auto &o : outputs) {
       mx::eval(o);

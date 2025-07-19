@@ -179,7 +179,8 @@ jobs:
           curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
 
       - name: Setup tmate session
-        if: matrix.os == 'macos-latest'
+        # if: matrix.os == 'macos-latest'
+        if: false
         uses: mxschmitt/action-tmate@v3
 
       - name: Run test (lei-jun)

@@ -1,12 +1,12 @@
-name: mlx-wheels
+name: mlx-wheels-arm64
 
 on:
   push:
     branches:
-      - sherpa-mlx-vad-2
+      - sherpa-mlx-vad
 
 jobs:
-  macos-mlx-wheel:
+  macos-mlx-wheel-arm64:
     if: true
     name: ${{ matrix.python-version }} ${{ matrix.mlx-version }}
     runs-on: ${{ matrix.os }}
@@ -28,8 +28,8 @@ jobs:
         uses: pypa/cibuildwheel@v2.21.3
         env:
           CIBW_BUILD: "${{ matrix.python-version}}-* "
-          CIBW_ENVIRONMENT: CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' -DMLX_ENABLE_X64_MAC=ON -DMLX_BUILD_METAL=OFF -DMLX_BUILD_GGUF=ON -DMLX_BUILD_SAFETENSORS=ON -DCMAKE_BUILD_TYPE=Release"  PYPI_RELEASE=1
-          CIBW_ARCHS: "universal2"
+          CIBW_ENVIRONMENT: CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES='arm64' -DMLX_BUILD_METAL=OFF -DMLX_BUILD_GGUF=ON -DMLX_BUILD_SAFETENSORS=ON -DCMAKE_BUILD_TYPE=Release"  PYPI_RELEASE=1
+          CIBW_ARCHS: "arm64"
           CIBW_BUILD_VERBOSITY: 3
 
           #  Don't repair macOS wheels
@@ -72,7 +72,7 @@ jobs:
             git status .
             git lfs track "*.whl"
             git add .
-            git commit -m "add mlx ${{ matrix.mlx-versino }}" || true
+            git commit -m "add mlx ${{ matrix.mlx-version }}" || true
 
             if [ $repo == hf ]; then
               git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/mlx-wheels || true

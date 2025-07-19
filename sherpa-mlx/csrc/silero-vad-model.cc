@@ -150,18 +150,22 @@ class SileroVadModel::Impl {
     min_speech_samples_ =
         config_.sample_rate * config_.silero_vad.min_speech_duration;
 
+    SHERPA_MLX_LOGE("init model");
     model_ = std::make_unique<mx::ImportedFunction>(
         mx::import_function(config_.silero_vad.model));
+    SHERPA_MLX_LOGE("init model done");
 
     Reset();
   }
 
   void ResetV4() {
+    SHERPA_MLX_LOGE("init states");
     if (states_.empty()) {
       states_.reserve(4);
       for (int32_t i = 0; i != 4; ++i) {
         states_.push_back(mx::zeros({1, 64}, mx::float32));
       }
+      SHERPA_MLX_LOGE("init done");
       return;
     }
 
@@ -173,18 +177,25 @@ class SileroVadModel::Impl {
   float Run(const float *samples, int32_t n) { return RunV4(samples, n); }
 
   float RunV4(const float *samples, int32_t n) {
+    SHERPA_MLX_LOGE("run with n %d", n);
     auto x = mx::array(samples, {1, n});
 
+    SHERPA_MLX_LOGE("here");
     std::vector<mx::array> inputs;
+    SHERPA_MLX_LOGE("here");
     inputs.reserve(1 + states_.size());
+    SHERPA_MLX_LOGE("here");
 
     inputs.push_back(std::move(x));
+    SHERPA_MLX_LOGE("here");
 
     for (auto &s : states_) {
       inputs.push_back(std::move(s));
     }
 
+    SHERPA_MLX_LOGE("iii %d", (int)states_.size());
     std::vector<mx::array> outputs = (*model_)(inputs);
+    SHERPA_MLX_LOGE("kkk %d", (int)outputs.size());
     float prob = outputs[0].item<float>();
     for (int32_t i = 0; i != states_.size(); ++i) {
       states_[i] = std::move(outputs[i + 1]);

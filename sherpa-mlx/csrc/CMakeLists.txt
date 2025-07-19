@@ -8,6 +8,8 @@ set(sources
   vad-model-config.cc
   vad-model.cc
   voice-activity-detector.cc
+  wave-reader.cc
+  wave-writer.cc
 )
 
 # Always static build

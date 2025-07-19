@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iomanip>
 
+#include "mlx/mlx.h"
 #include "sherpa-mlx/csrc/voice-activity-detector.h"
 #include "sherpa-mlx/csrc/wave-reader.h"
 #include "sherpa-mlx/csrc/wave-writer.h"
@@ -38,6 +39,9 @@ For instance, use
 
 input.wav should be 16kHz.
 )usage";
+
+  namespace mx = mlx::core;
+  mx::set_default_device(mx::Device::cpu);
 
   sherpa_mlx::ParseOptions po(kUsageMessage);
   sherpa_mlx::VadModelConfig config;

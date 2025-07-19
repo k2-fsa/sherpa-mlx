@@ -3,7 +3,7 @@ name: mlx-wheels
 on:
   push:
     branches:
-      - sherpa-mlx-vad
+      - sherpa-mlx-vad-2
 
 jobs:
   macos-mlx-wheel:

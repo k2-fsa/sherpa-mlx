@@ -45,7 +45,7 @@ jobs:
       - name: Install mlx
         shell: bash
         run: |
-          python3 -m pip install mlx
+          python3 -m pip install mlx==0.26.3
 
       - name: Show mlx
         shell: bash

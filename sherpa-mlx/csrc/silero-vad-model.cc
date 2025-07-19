@@ -196,6 +196,8 @@ class SileroVadModel::Impl {
     for (auto &s : states_) {
       inputs.push_back(std::move(s));
     }
+    SHERPA_MLX_LOGE("here");
+    mx::eval(inputs);
 
     SHERPA_MLX_LOGE("iii %d", (int)states_.size());
 

@@ -16,7 +16,7 @@ set(sources
 add_library(sherpa-mlx-core STATIC ${sources})
 target_include_directories(
   sherpa-mlx-core
-  PRIVATE
+  PUBLIC
     ${PROJECT_SOURCE_DIR}
     $ENV{MLX_CMAKE_DIR}/include
 )
@@ -31,10 +31,13 @@ set_target_properties(
 
 target_link_libraries(
   sherpa-mlx-core
-  PRIVATE
+  PUBLIC
   -L$ENV{MLX_CMAKE_DIR}/lib
   -lmlx
   )
+
+add_executable(sherpa-mlx-vad sherpa-mlx-vad.cc)
+target_link_libraries(sherpa-mlx-vad sherpa-mlx-core)
 
 set(srcs_to_check)
 foreach(s IN LISTS sources)

@@ -72,4 +72,24 @@ jobs:
           cmake ..
           make VERBOSE=1
 
+          ls -lh bin
+          echo "---"
           ls -lh lib
+
+      - name: View dependencies (ubuntu-latest)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          cd build/bin
+          readelf -d sherpa-mlx-vad
+          echo "---"
+          ldd sherpa-mlx-vad
+
+      - name: View dependencies (macos-latest)
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          cd build/bin
+          otool -L sherpa-mlx-vad
+          echo "---"
+          otool -l sherpa-mlx-vad

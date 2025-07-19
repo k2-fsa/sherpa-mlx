@@ -163,7 +163,9 @@ class SileroVadModel::Impl {
     if (states_.empty()) {
       states_.reserve(4);
       for (int32_t i = 0; i != 4; ++i) {
-        states_.push_back(mx::zeros({1, 64}, mx::float32));
+        auto s = mx::zeros({1, 64}, mx::float32);
+        mx::eval(s);
+        states_.push_back(std::move(s));
       }
       SHERPA_MLX_LOGE("init done");
       return;
@@ -177,32 +179,39 @@ class SileroVadModel::Impl {
   float Run(const float *samples, int32_t n) { return RunV4(samples, n); }
 
   float RunV4(const float *samples, int32_t n) {
-    SHERPA_MLX_LOGE("run with n %d", n);
+    // SHERPA_MLX_LOGE("run with n %d", n);
     auto x = mx::array(samples, {1, n});
 
-    SHERPA_MLX_LOGE("here");
+    // SHERPA_MLX_LOGE("here");
     std::vector<mx::array> inputs;
-    SHERPA_MLX_LOGE("here");
+    // SHERPA_MLX_LOGE("here");
     inputs.reserve(1 + states_.size());
     SHERPA_MLX_LOGE("here");
 
     inputs.push_back(std::move(x));
-    SHERPA_MLX_LOGE("here");
+    // SHERPA_MLX_LOGE("here");
 
     for (auto &s : states_) {
       inputs.push_back(std::move(s));
     }
 
-    SHERPA_MLX_LOGE("iii %d", (int)states_.size());
+    // SHERPA_MLX_LOGE("iii %d", (int)states_.size());
     std::vector<mx::array> outputs = (*model_)(inputs);
-    SHERPA_MLX_LOGE("kkk %d", (int)outputs.size());
+    for (auto &o : outputs) {
+      mx::eval(o);
+    }
+    // SHERPA_MLX_LOGE("kkk %d", (int)outputs.size());
+    // SHERPA_MLX_LOGE("outputs0 %d", (int)outputs[0].size());
+    SHERPA_MLX_LOGE("outputs %p", outputs[0].data<float>());
+    SHERPA_MLX_LOGE("outputs %.3f", outputs[0].item<float>());
+    SHERPA_MLX_LOGE("outputs %p", outputs[0].data<float>());
     float prob = outputs[0].item<float>();
-    SHERPA_MLX_LOGE("here");
+    SHERPA_MLX_LOGE("here: prob: %.3f", prob);
     for (int32_t i = 0; i != states_.size(); ++i) {
-      SHERPA_MLX_LOGE("here i %d", i);
+      // SHERPA_MLX_LOGE("here i %d", i);
       states_[i] = std::move(outputs[i + 1]);
     }
-    SHERPA_MLX_LOGE("here");
+    // SHERPA_MLX_LOGE("here");
 
     return prob;
   }

@@ -60,7 +60,12 @@ jobs:
       - name: Install mlx
         shell: bash
         run: |
-          python3 -m pip install mlx==0.26.3
+          os=${{ matrix.os }}
+          if [[ $os == 'ubuntu-latest' ]]; then
+            python3 -m pip install mlx[cpu]
+          else
+            python3 -m pip install mlx
+          fi
 
       - name: Show mlx
         shell: bash
@@ -141,7 +146,12 @@ jobs:
       - name: Install mlx
         shell: bash
         run: |
-          python3 -m pip install mlx==0.26.3
+          os=${{ matrix.os }}
+          if [[ $os == 'ubuntu-latest' ]]; then
+            python3 -m pip install mlx[cpu]
+          else
+            python3 -m pip install mlx
+          fi
 
       - name: Retrieve artifact from ${{ matrix.os }}
         uses: actions/download-artifact@v4
@@ -186,7 +196,7 @@ jobs:
           mv build/bin .
           d=vad-test-results-${{ matrix.os }}
           mkdir $d
-          mv *.wav $d
+          cp -v *.wav $d
           tar cjvf $d.tar.bz2 $d
 
           ls -lh *.wav

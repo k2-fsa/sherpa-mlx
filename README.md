@@ -23,7 +23,12 @@ make
 3. Download test files to the build directory
 
 wget https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/lei-jun-test.wav
+
+# for macOS
 wget https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+
+# for linux
+# wget -O silero-vad-v4.mlxfn https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4-linux.mlxfn
 
 4. Run it
 

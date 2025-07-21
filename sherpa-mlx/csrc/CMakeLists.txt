@@ -29,11 +29,12 @@ set_target_properties(
     CXX_VISIBILITY_PRESET hidden
 )
 
+set(MLX_DIR $ENV{MLX_CMAKE_DIR}/share/cmake/MLX)
+find_package(MLX CONFIG REQUIRED)
 target_link_libraries(
   sherpa-mlx-core
   PUBLIC
-  -L$ENV{MLX_CMAKE_DIR}/lib
-  -lmlx
+  mlx
   )
 
 if(UNIX AND NOT APPLE)

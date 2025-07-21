@@ -176,7 +176,11 @@ jobs:
         run: |
           curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/lei-jun-test.wav
           curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/Obama.wav
-          curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+          if [[ ${{ matrix.os }} == ubuntu-latest ]]; then
+            curl -SL -o silero-vad-v4.mlxfn https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4-linux.mlxfn
+          else
+            curl -SL -O https://github.com/k2-fsa/sherpa-mlx/releases/download/vad-models/silero-vad-v4.mlxfn
+          fi
 
       - name: Setup tmate session
         # if: matrix.os == 'macos-latest'

@@ -64,9 +64,9 @@ jobs:
           if [[ $os == 'ubuntu-latest' ]]; then
             python3 -m pip install mlx[cpu]
           else
-            # python3 -m pip install mlx
-            curl -SL -O https://huggingface.co/csukuangfj/mlx-wheels/resolve/main/cpu/0.26.5/mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
-            python3 -m pip install ./mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+            python3 -m pip install mlx
+            # curl -SL -O https://huggingface.co/csukuangfj/mlx-wheels/resolve/main/cpu/0.26.5/mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+            # python3 -m pip install ./mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
           fi
 
       - name: Show mlx
@@ -152,9 +152,9 @@ jobs:
           if [[ $os == 'ubuntu-latest' ]]; then
             python3 -m pip install mlx[cpu]
           else
-            # python3 -m pip install mlx
-            curl -SL -O https://huggingface.co/csukuangfj/mlx-wheels/resolve/main/cpu/0.26.5/mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
-            python3 -m pip install ./mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+            python3 -m pip install mlx
+            # curl -SL -O https://huggingface.co/csukuangfj/mlx-wheels/resolve/main/cpu/0.26.5/mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
+            # python3 -m pip install ./mlx-0.26.5-cp310-cp310-macosx_11_0_arm64.whl
           fi
 
       - name: Retrieve artifact from ${{ matrix.os }}

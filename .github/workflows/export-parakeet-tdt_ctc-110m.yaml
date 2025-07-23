@@ -1,19 +1,19 @@
 # Copyright (c)  2025  Xiaomi Corporation
-name: export-parakeet-tdt-0-6b-v2
+name: export-parakeet-tdt-ctc-110m
 
 on:
   push:
     branches:
-      - export-parakeet-2
+      - export-parakeet
 
   workflow_dispatch:
 
 concurrency:
-  group: parakeet-tdt-0-6b-v2-${{ github.ref }}
+  group: parakeet-tdt-ctc-110m-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  export-parakeet-tdt-0-6b-v2:
+  export-parakeet-tdt-ctc-110m:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -39,12 +39,11 @@ jobs:
       - name: Run
         shell: bash
         run: |
-          cd scripts/nemo/parakeet-tdt-0.6b-v2/
+          cd scripts/nemo//parakeet-tdt_ctc-110m/
           ./run.sh
           ls -lh
 
-
-      - name: Collect results
+      - name: Collect results (CTC)
         shell: bash
         env:
           MS_TOKEN: ${{ secrets.MS_TOKEN }}
@@ -53,15 +52,16 @@ jobs:
           export GIT_LFS_SKIP_SMUDGE=1
           export GIT_CLONE_PROTECTION_ACTIVE=false
 
-          mv -v scripts/nemo/parakeet-tdt-0.6b-v2/*.mlxfn .
-          mv -v scripts/nemo/parakeet-tdt-0.6b-v2/tokens.txt .
-          mv -v scripts/nemo/parakeet-tdt-0.6b-v2/0.wav .
+          mv -v scripts/nemo/parakeet-tdt_ctc-110m/model*.mlxfn .
+          cp -v scripts/nemo/parakeet-tdt_ctc-110m/tokens.txt .
+          cp -v scripts/nemo/parakeet-tdt_ctc-110m/0.wav .
+
 
           for m in float16 bfloat16 float32 float16-4bit bfloat16-4bit float32-4bit; do
-            d=sherpa-mlx-nemo-parakeet-tdt-0.6b-v2-$m
+            d=sherpa-mlx-nemo-parakeet-tdt_ctc-110m-$m
             mkdir $d
             mkdir $d/test_wavs
-            cp *.$m.mlxfn $d/
+            cp model.$m.mlxfn $d/
             cp tokens.txt $d/
             cp 0.wav $d/test_wavs
 
@@ -69,12 +69,10 @@ jobs:
 
             ls -lh *.tar.bz2
 
-            rm -rf hf ms
+            rm -rf hf
             git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d hf
-            # git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d.git ms
 
             cp -av $d/* hf
-            # cp -av $d/* ms
 
             pushd hf
             git status
@@ -83,17 +81,55 @@ jobs:
             git commit -m "add model files"
             git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d
             popd
-
-            # pushd ms
-            # git status
-            # git lfs track "*.wav" "*.mlxfn"
-            # git add .
-            # git commit -m "add model files"
-            # git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d
-            # popd
           done
 
-          rm -rf hf ms
+          rm -rf hf
+
+      - name: Collect results (Transducer)
+        shell: bash
+        env:
+          MS_TOKEN: ${{ secrets.MS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          export GIT_LFS_SKIP_SMUDGE=1
+          export GIT_CLONE_PROTECTION_ACTIVE=false
+
+          mv -v scripts/nemo/parakeet-tdt_ctc-110m/encoder*.mlxfn .
+          mv -v scripts/nemo/parakeet-tdt_ctc-110m/decoder*.mlxfn .
+          mv -v scripts/nemo/parakeet-tdt_ctc-110m/joiner*.mlxfn .
+          cp -v scripts/nemo/parakeet-tdt_ctc-110m/tokens.txt .
+          cp -v scripts/nemo/parakeet-tdt_ctc-110m/0.wav .
+
+
+          for m in float16 bfloat16 float32 float16-4bit bfloat16-4bit float32-4bit; do
+            d=sherpa-mlx-nemo-parakeet-tdt_transducer-110m-$m
+            mkdir $d
+            mkdir $d/test_wavs
+            cp encoder.$m.mlxfn $d/
+            cp decoder.$m.mlxfn $d/
+            cp joiner.$m.mlxfn $d/
+            cp tokens.txt $d/
+            cp 0.wav $d/test_wavs
+
+            tar cjfv $d.tar.bz2 $d
+
+            ls -lh *.tar.bz2
+
+            rm -rf hf
+            git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d hf
+
+            cp -av $d/* hf
+
+            pushd hf
+            git status
+            git lfs track "*.wav" "*.mlxfn"
+            git add .
+            git commit -m "add model files"
+            git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d
+            popd
+          done
+
+          rm -rf hf
 
       - name: Upload
         shell: bash
@@ -105,11 +141,9 @@ jobs:
           export GIT_CLONE_PROTECTION_ACTIVE=false
 
           git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models hf
-          # git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models.git ms
 
           ls -lh *.tar.bz2
 
-          # for repo in ms hf; do
           for repo in hf; do
             d=$repo/asr-models/non-streaming
             mkdir -p $d
@@ -124,18 +158,8 @@ jobs:
               git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models || true
             fi
 
-            if [ $repo == ms ]; then
-              git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models || true
-            fi
             popd
           done
-
-      - name: Remove the large file
-        shell: bash
-        run: |
-          rm -v sherpa-mlx-nemo-parakeet-tdt-0.6b-v2-float32.tar.bz2
-
-          ls -lh *.tar.bz2
 
       - name: Release
         uses: svenstaro/upload-release-action@v2

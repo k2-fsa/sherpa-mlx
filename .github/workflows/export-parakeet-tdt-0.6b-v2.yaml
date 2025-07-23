@@ -1,0 +1,148 @@
+# Copyright (c)  2025  Xiaomi Corporation
+name: export-parakeet-tdt-0-6b-v2
+
+on:
+  push:
+    branches:
+      - export-parakeet
+
+  workflow_dispatch:
+
+concurrency:
+  group: parakeet-tdt-0-6b-v2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-parakeet-tdt-0-6b-v2:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set git config
+        shell: bash
+        run: |
+          git config --global user.email "csukuangfj@gmail.com"
+          git config --global user.name "Fangjun Kuang"
+
+      - name: Run
+        shell: bash
+        run: |
+          cd scripts/nemo/parakeet-tdt-0.6b-v2/
+          ./run.sh
+          ls -lh
+
+
+      - name: Collect results
+        shell: bash
+        env:
+          MS_TOKEN: ${{ secrets.MS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          export GIT_LFS_SKIP_SMUDGE=1
+          export GIT_CLONE_PROTECTION_ACTIVE=false
+
+          mv -v scripts/nemo/parakeet-tdt-0.6b-v2/*.mlxfn .
+          mv -v scripts/nemo/parakeet-tdt-0.6b-v2/tokens.txt .
+          mv -v scripts/nemo/parakeet-tdt-0.6b-v2/0.wav .
+
+          for m in float16 bfloat16 float32 float16-4bit bfloat16-4bit float32-4bit; do
+            d=sherpa-mlx-nemo-parakeet-tdt-0.6b-v2-$m
+            mkdir $d
+            mkdir $d/test_wavs
+            cp *.$m.mlxfn $d/
+            cp tokens.txt $d/
+            cp 0.wav $d/test_wavs
+
+            tar cjfv $d.tar.bz2 $d
+
+            ls -lh *.tar.bz2
+
+            rm -rf hf ms
+            git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d hf
+            git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d.git ms
+
+            cp -av $d/* hf
+            cp -av $d/* ms
+
+            pushd hf
+            git status
+            git lfs track "*.wav" "*.mlxfn"
+            git add .
+            git commit -m "add model files"
+            git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d
+            popd
+
+            pushd ms
+            git status
+            git lfs track "*.wav" "*.mlxfn"
+            git add .
+            git commit -m "add model files"
+            # git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d
+            popd
+          done
+
+          rm -rf hf ms
+
+      - name: Upload
+        shell: bash
+        env:
+          MS_TOKEN: ${{ secrets.MS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          export GIT_LFS_SKIP_SMUDGE=1
+          export GIT_CLONE_PROTECTION_ACTIVE=false
+
+          git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models hf
+          git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models.git ms
+
+          ls -lh *.tar.bz2
+
+          for repo in ms hf; do
+            d=$repo/asr-models/non-streaming
+            mkdir -p $d
+            cp -v *.tar.bz2 $d
+            pushd $repo
+            git status .
+            git lfs track "*.tar.bz2"
+            git add .
+            git commit -m 'add parakeet-tdt-0.6b-v2' || true
+
+            if [ $repo == hf ]; then
+              git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models || true
+            fi
+
+            if [ $repo == ms ]; then
+              git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models || true
+            fi
+            popd
+          done
+
+      - name: Remove the large file
+        shell: bash
+        env:
+          MS_TOKEN: ${{ secrets.MS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          rm -v sherpa-mlx-nemo-parakeet-tdt-0.6b-v2-float32.tar.bz2
+
+          ls -lh *.tar.bz2
+
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file_glob: true
+          file: ./*.tar.bz2
+          overwrite: true
+          tag: asr-models

@@ -3,3 +3,8 @@ dist
 sherpa_mlx.egg-info
 *.wav
 *.mlxfn
+config.json
+*.safetensors
+tokens.txt
+build-cpu
+parakeet_mlx

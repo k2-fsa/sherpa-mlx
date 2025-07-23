@@ -71,10 +71,10 @@ jobs:
 
             rm -rf hf ms
             git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d hf
-            git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d.git ms
+            # git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d.git ms
 
             cp -av $d/* hf
-            cp -av $d/* ms
+            # cp -av $d/* ms
 
             pushd hf
             git status
@@ -84,13 +84,13 @@ jobs:
             git push https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/$d
             popd
 
-            pushd ms
-            git status
-            git lfs track "*.wav" "*.mlxfn"
-            git add .
-            git commit -m "add model files"
+            # pushd ms
+            # git status
+            # git lfs track "*.wav" "*.mlxfn"
+            # git add .
+            # git commit -m "add model files"
             # git push https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/$d
-            popd
+            # popd
           done
 
           rm -rf hf ms
@@ -105,11 +105,12 @@ jobs:
           export GIT_CLONE_PROTECTION_ACTIVE=false
 
           git clone https://csukuangfj:$HF_TOKEN@huggingface.co/csukuangfj/sherpa-mlx-models hf
-          git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models.git ms
+          # git clone https://oauth2:${MS_TOKEN}@www.modelscope.cn/csukuangfj/sherpa-mlx-models.git ms
 
           ls -lh *.tar.bz2
 
-          for repo in ms hf; do
+          # for repo in ms hf; do
+          for repo in hf; do
             d=$repo/asr-models/non-streaming
             mkdir -p $d
             cp -v *.tar.bz2 $d
@@ -131,9 +132,6 @@ jobs:
 
       - name: Remove the large file
         shell: bash
-        env:
-          MS_TOKEN: ${{ secrets.MS_TOKEN }}
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           rm -v sherpa-mlx-nemo-parakeet-tdt-0.6b-v2-float32.tar.bz2
 

@@ -35,7 +35,7 @@ def create_fbank():
     opts.frame_opts.window_type = "hann"
 
     opts.mel_opts.low_freq = 0
-    opts.mel_opts.num_bins = 128
+    opts.mel_opts.num_bins = 80
 
     opts.mel_opts.is_librosa = True
 
@@ -56,8 +56,8 @@ class MlxModel:
         self.joiner = mx.import_function(joiner)
 
     def get_decoder_state(self):
-        h = mx.zeros((2, 1, 640))
-        c = mx.zeros((2, 1, 640))
+        h = mx.zeros((1, 1, 640))
+        c = mx.zeros((1, 1, 640))
         return h, c
 
     def run_encoder(self, x: mx.array):
@@ -75,10 +75,10 @@ class MlxModel:
         """
         Args:
           x: (T, C)
-          h, c: (2, 1, 640)
+          h, c: (1, 1, 640)
         Returns:
           out: (1, 1, decoder_dim)
-          out_h, out_c: (2, 1, 640)
+          out_h, out_c: (1, 1, 640)
         """
         y = mx.array([[y]], dtype=mx.int32)
         out, h, c = self.decoder(y, h, c)
@@ -143,7 +143,7 @@ def main():
 
     if features.shape[0] < target_length:
         padding = np.zeros(
-            (target_length - features.shape[0], 128),
+            (target_length - features.shape[0], 80),
             dtype=np.float32,
         )
         #  padding = features.mean(axis=0, keepdims=True).repeat(

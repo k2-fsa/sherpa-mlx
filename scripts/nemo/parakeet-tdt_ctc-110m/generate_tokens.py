@@ -1,0 +1,1 @@
+../parakeet-tdt-0.6b-v2/generate_tokens.py

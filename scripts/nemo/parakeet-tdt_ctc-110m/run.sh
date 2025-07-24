@@ -7,7 +7,7 @@ function install_deps() {
 }
 
 function download_model_files() {
-  # see https://hf-mirror.com/nvidia/parakeet-tdt_ctc-110m
+  # see https://huggingface.co/nvidia/parakeet-tdt_ctc-110m
   curl -SL -O https://huggingface.co/mlx-community/parakeet-tdt_ctc-110m/resolve/main/config.json
   curl -SL -O https://huggingface.co/mlx-community/parakeet-tdt_ctc-110m/resolve/main/model.safetensors
   curl -SL -O https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v2/resolve/main/test_wavs/0.wav

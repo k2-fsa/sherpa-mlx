@@ -8,3 +8,4 @@ config.json
 tokens.txt
 build-cpu
 parakeet_mlx
+*.pt

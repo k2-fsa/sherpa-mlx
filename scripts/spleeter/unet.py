@@ -126,9 +126,9 @@ class UNet(nn.Module):
         up2 = up2[:, 1:-2, 1:-2, :]
         up2 = nn.relu(up2)
         batch8 = self.bn6(up2)
-        return batch8
 
-        merge2 = torch.cat([conv4, batch8], axis=1)  # (3, 256, 32, 64)
+        merge2 = mx.concatenate([conv4, batch8], axis=3)  # (3, 32, 64, 256)
+        return merge2
 
         up3 = self.up3(merge2)
         up3 = up3[:, :, 1:-2, 1:-2]

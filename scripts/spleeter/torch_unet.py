@@ -94,13 +94,13 @@ class UNet(torch.nn.Module):
 
         x = torch.nn.functional.pad(rel2, (1, 2, 1, 2), "constant", 0)
         conv3 = self.conv2(x)  # (3, 64, 64, 128)
-        return conv3
         batch3 = self.bn2(conv3)
         rel3 = torch.nn.functional.leaky_relu(
             batch3, negative_slope=0.2
         )  # (3, 64, 64, 128)
 
         x = torch.nn.functional.pad(rel3, (1, 2, 1, 2), "constant", 0)
+        return x
         conv4 = self.conv3(x)  # (3, 128, 32, 64)
         batch4 = self.bn3(conv4)
         rel4 = torch.nn.functional.leaky_relu(

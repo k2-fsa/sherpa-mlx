@@ -33,7 +33,7 @@ jobs:
       - name: Install Python dependencies
         shell: bash
         run: |
-          python3 -m pip install mlx torch
+          python3 -m pip install mlx torch "numpy<2"
 
       - name: Set git config
         shell: bash

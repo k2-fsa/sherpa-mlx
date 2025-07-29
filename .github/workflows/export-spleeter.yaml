@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: parakeet-spleeter-${{ github.ref }}
+  group: export-spleeter-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

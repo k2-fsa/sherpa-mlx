@@ -94,19 +94,20 @@ class UNet(nn.Module):
             mode="constant",
             constant_values=0,
         )
-        return x
         conv4 = self.conv3(x)  # (3, 128, 32, 64)
         batch4 = self.bn3(conv4)
-        rel4 = torch.nn.functional.leaky_relu(
-            batch4, negative_slope=0.2
-        )  # (3, 128, 32, 64)
+        rel4 = nn.leaky_relu(batch4, negative_slope=0.2)  # (3, 32, 64, 128)
 
-        x = torch.nn.functional.pad(rel4, (1, 2, 1, 2), "constant", 0)
-        conv5 = self.conv4(x)  # (3, 256, 16, 32)
+        x = mx.pad(
+            rel4,
+            pad_width=[(0, 0), (1, 2), (1, 2), (0, 0)],
+            mode="constant",
+            constant_values=0,
+        )
+        conv5 = self.conv4(x)  # (3, 16, 32, 256)
         batch5 = self.bn4(conv5)
-        rel6 = torch.nn.functional.leaky_relu(
-            batch5, negative_slope=0.2
-        )  # (3, 256, 16, 32)
+        rel6 = nn.leaky_relu(batch5, negative_slope=0.2)  # (3, 16, 32, 256)
+        return rel6
 
         x = torch.nn.functional.pad(rel6, (1, 2, 1, 2), "constant", 0)
         conv6 = self.conv5(x)  # (3, 512, 8, 16)

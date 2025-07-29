@@ -12,57 +12,39 @@ class UNet(nn.Module):
         self.bn = nn.BatchNorm(16, track_running_stats=True, eps=1e-3, momentum=0.01)
         self.conv1 = nn.Conv2d(16, 32, kernel_size=5, stride=(2, 2), padding=0)
         self.bn1 = nn.BatchNorm(32, track_running_stats=True, eps=1e-3, momentum=0.01)
-        return
 
-        self.conv2 = torch.nn.Conv2d(32, 64, kernel_size=5, stride=(2, 2), padding=0)
-        self.bn2 = torch.nn.BatchNorm2d(
-            64, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=5, stride=(2, 2), padding=0)
+        self.bn2 = nn.BatchNorm(64, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.conv3 = torch.nn.Conv2d(64, 128, kernel_size=5, stride=(2, 2), padding=0)
-        self.bn3 = torch.nn.BatchNorm2d(
-            128, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=5, stride=(2, 2), padding=0)
+        self.bn3 = nn.BatchNorm(128, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.conv4 = torch.nn.Conv2d(128, 256, kernel_size=5, stride=(2, 2), padding=0)
-        self.bn4 = torch.nn.BatchNorm2d(
-            256, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=5, stride=(2, 2), padding=0)
+        self.bn4 = nn.BatchNorm(256, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.conv5 = torch.nn.Conv2d(256, 512, kernel_size=5, stride=(2, 2), padding=0)
+        self.conv5 = nn.Conv2d(256, 512, kernel_size=5, stride=(2, 2), padding=0)
 
-        self.up1 = torch.nn.ConvTranspose2d(512, 256, kernel_size=5, stride=2)
-        self.bn5 = torch.nn.BatchNorm2d(
-            256, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.up1 = nn.ConvTranspose2d(512, 256, kernel_size=5, stride=2)
+        self.bn5 = nn.BatchNorm(256, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.up2 = torch.nn.ConvTranspose2d(512, 128, kernel_size=5, stride=2)
-        self.bn6 = torch.nn.BatchNorm2d(
-            128, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.up2 = nn.ConvTranspose2d(512, 128, kernel_size=5, stride=2)
+        self.bn6 = nn.BatchNorm(128, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.up3 = torch.nn.ConvTranspose2d(256, 64, kernel_size=5, stride=2)
-        self.bn7 = torch.nn.BatchNorm2d(
-            64, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.up3 = nn.ConvTranspose2d(256, 64, kernel_size=5, stride=2)
+        self.bn7 = nn.BatchNorm(64, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.up4 = torch.nn.ConvTranspose2d(128, 32, kernel_size=5, stride=2)
-        self.bn8 = torch.nn.BatchNorm2d(
-            32, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.up4 = nn.ConvTranspose2d(128, 32, kernel_size=5, stride=2)
+        self.bn8 = nn.BatchNorm(32, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.up5 = torch.nn.ConvTranspose2d(64, 16, kernel_size=5, stride=2)
-        self.bn9 = torch.nn.BatchNorm2d(
-            16, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.up5 = nn.ConvTranspose2d(64, 16, kernel_size=5, stride=2)
+        self.bn9 = nn.BatchNorm(16, track_running_stats=True, eps=1e-3, momentum=0.01)
 
-        self.up6 = torch.nn.ConvTranspose2d(32, 1, kernel_size=5, stride=2)
-        self.bn10 = torch.nn.BatchNorm2d(
-            1, track_running_stats=True, eps=1e-3, momentum=0.01
-        )
+        self.up6 = nn.ConvTranspose2d(32, 1, kernel_size=5, stride=2)
+        self.bn10 = nn.BatchNorm(1, track_running_stats=True, eps=1e-3, momentum=0.01)
 
         # output logit is False, so we need self.up7
-        self.up7 = torch.nn.Conv2d(1, 2, kernel_size=4, dilation=2, padding=3)
+        self.up7 = nn.Conv2d(1, 2, kernel_size=4, dilation=2, padding=3)
+        return
 
     def forward(self, x):
         """

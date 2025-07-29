@@ -4,6 +4,7 @@
 import argparse
 
 import mlx.core as mx
+import numpy as np
 import torch
 from mlx.utils import tree_flatten, tree_map, tree_unflatten
 
@@ -43,6 +44,7 @@ def replace(state_dict):
     return ans
 
 
+@torch.no_grad()
 def test(torch_model, mlx_model):
     torch.manual_seed(20250729)
     num_audio_channels = 2
@@ -59,6 +61,8 @@ def test(torch_model, mlx_model):
     y1 = mlx_model(x1)
     print("y0", y0.shape)
     print("y1", y1.shape)
+    y1 = torch.from_numpy(np.array(y1)).permute(0, 3, 1, 2)
+    print("y0-y1", (y0 - y1).abs().max())
 
 
 def main():

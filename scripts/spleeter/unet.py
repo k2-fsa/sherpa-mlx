@@ -74,9 +74,9 @@ class UNet(nn.Module):
             mode="constant",
             constant_values=0,
         )
-        return x
-        conv2 = self.conv1(x)  # (3, 32, 128, 256)
+        conv2 = self.conv1(x)  # (3, 128, 256, 32)
         batch2 = self.bn1(conv2)
+        return batch2
         rel2 = torch.nn.functional.leaky_relu(
             batch2, negative_slope=0.2
         )  # (3, 32, 128, 256)

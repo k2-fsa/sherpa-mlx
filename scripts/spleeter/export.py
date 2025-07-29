@@ -45,10 +45,20 @@ def replace(state_dict):
 
 def test(torch_model, mlx_model):
     torch.manual_seed(20250729)
-    x0 = torch.rand(2, 3, 512, 1024)  # (N, C, H, W)
-    x1 = x0.permute(0, 2, 3, 1)  # (N, H, W, C)
+    num_audio_channels = 2
+    num_splits = 3
+    H = 512
+    W = 1024
+    x0 = torch.rand(num_audio_channels, num_splits, H, W)
+    x1 = x0.permute(1, 2, 3, 0)
     x1 = mx.array(x1.numpy())
+
     print(x0.shape, x1.shape, x0.sum(), x1.sum(), x0.mean(), x1.mean())
+
+    y0 = torch_model(x0)
+    y1 = mlx_model(x1)
+    print("y0", y0.shape)
+    print("y1", y1.shape)
 
 
 def main():

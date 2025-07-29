@@ -74,10 +74,14 @@ class UNet(torch.nn.Module):
           y: (num_audio_channels, num_splits, 512, 1024)
         """
         x = x.permute(1, 0, 2, 3)
+        # x: (num_splits, num_audio_channels, 512, 1024) -> (N, C, H, W)
 
         in_x = x
         # in_x is (3, 2, 512, 1024) = (T, 2, 512, 1024)
+
         x = torch.nn.functional.pad(x, (1, 2, 1, 2), "constant", 0)
+        # x: (3, 2, 515, 1027)
+        return x
         conv1 = self.conv(x)
         batch1 = self.bn(conv1)
         rel1 = torch.nn.functional.leaky_relu(batch1, negative_slope=0.2)

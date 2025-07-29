@@ -49,14 +49,21 @@ class UNet(nn.Module):
     def forward(self, x):
         """
         Args:
-          x: (num_audio_channels, num_splits, 512, 1024)
+          x: (num_splits, 512, 1024, num_audio_channels)
         Returns:
-          y: (num_audio_channels, num_splits, 512, 1024)
+          y: (num_splits, 512, 1024, num_audio_channels)
         """
-        x = x.permute(1, 0, 2, 3)
-
         in_x = x
-        # in_x is (3, 2, 512, 1024) = (T, 2, 512, 1024)
+
+        # in_x is (3, 512, 1024, 2) = (T, 512, 1024, 2)
+        x = mx.pad(
+            x,
+            pad_width=[(0, 0), (1, 2), (1, 2), (0, 0)],
+            mode="constant",
+            constant_values=0,
+        )
+        return x
+
         x = torch.nn.functional.pad(x, (1, 2, 1, 2), "constant", 0)
         conv1 = self.conv(x)
         batch1 = self.bn(conv1)
@@ -137,3 +144,5 @@ class UNet(nn.Module):
 
         ans = up7 * in_x
         return ans.permute(1, 0, 2, 3)
+
+    __call__ = forward

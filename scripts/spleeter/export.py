@@ -47,6 +47,8 @@ def replace(state_dict):
 @torch.no_grad()
 def test(torch_model, mlx_model):
     torch.manual_seed(20250729)
+    torch_model.eval()
+    mlx_model.eval()
     num_audio_channels = 2
     num_splits = 3
     H = 512
@@ -65,6 +67,7 @@ def test(torch_model, mlx_model):
     print("y0-y1", (y0 - y1).abs().max())
 
 
+@torch.no_grad()
 def main():
     args = get_args()
 
@@ -78,6 +81,9 @@ def main():
 
     accompaniment.load_state_dict(accompaniment_state_dict, strict=True)
     vocals.load_state_dict(vocals_state_dict, strict=True)
+
+    accompaniment.eval()
+    vocals.eval()
 
     accompaniment_mlx = UNet()
     vocals_mlx = UNet()

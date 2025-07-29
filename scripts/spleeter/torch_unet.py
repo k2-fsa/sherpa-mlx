@@ -128,12 +128,12 @@ class UNet(torch.nn.Module):
         batch8 = self.bn6(up2)
 
         merge2 = torch.cat([conv4, batch8], axis=1)  # (3, 256, 32, 64)
-        return merge2
 
         up3 = self.up3(merge2)
         up3 = up3[:, :, 1:-2, 1:-2]
         up3 = torch.nn.functional.relu(up3)
         batch9 = self.bn7(up3)
+        return batch9
 
         merge3 = torch.cat([conv3, batch9], axis=1)  # (3, 128, 64, 128)
 

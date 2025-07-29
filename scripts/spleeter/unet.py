@@ -1,7 +1,7 @@
 # Copyright    2025  Xiaomi Corp.        (authors: Fangjun Kuang)
 
-import mlx.nn as nn
 import mlx.core as mx
+import mlx.nn as nn
 import torch
 
 

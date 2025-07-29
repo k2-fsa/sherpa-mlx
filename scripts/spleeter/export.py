@@ -5,9 +5,9 @@ import argparse
 
 import mlx.core as mx
 import numpy as np
-from mlx_lm.utils import quantize_model
 import torch
 from mlx.utils import tree_flatten, tree_map, tree_unflatten
+from mlx_lm.utils import quantize_model
 
 from torch_unet import UNet as TorchUNet
 from unet import UNet

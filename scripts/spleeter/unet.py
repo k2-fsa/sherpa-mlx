@@ -115,18 +115,18 @@ class UNet(nn.Module):
             constant_values=0,
         )
         conv6 = self.conv5(x)  # (3, 8, 16, 512)
-        return conv6
 
-        up1 = self.up1(conv6)
-        up1 = up1[:, :, 1:-2, 1:-2]  # (3, 256, 16, 32)
-        up1 = torch.nn.functional.relu(up1)
+        up1 = self.up1(conv6)  # (3, 19, 35, 256)
+        up1 = up1[:, 1:-2, 1:-2, :]  # (3, 16, 32, 256)
+        up1 = nn.relu(up1)
         batch7 = self.bn5(up1)
-        merge1 = torch.cat([conv5, batch7], axis=1)  # (3, 512, 16, 32)
+        merge1 = mx.concatenate([conv5, batch7], axis=3)  # (3, 16, 32, 512)
 
         up2 = self.up2(merge1)
-        up2 = up2[:, :, 1:-2, 1:-2]
-        up2 = torch.nn.functional.relu(up2)
+        up2 = up2[:, 1:-2, 1:-2, :]
+        up2 = nn.relu(up2)
         batch8 = self.bn6(up2)
+        return batch8
 
         merge2 = torch.cat([conv4, batch8], axis=1)  # (3, 256, 32, 64)
 

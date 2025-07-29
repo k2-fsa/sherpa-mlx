@@ -33,7 +33,7 @@ jobs:
       - name: Install Python dependencies
         shell: bash
         run: |
-          python3 -m pip install mlx torch "numpy<2"
+          python3 -m pip install mlx torch "numpy<2" mlx_lm kaldi-native-fbank librosa soundfile
 
       - name: Set git config
         shell: bash

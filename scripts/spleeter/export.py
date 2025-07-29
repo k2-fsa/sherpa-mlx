@@ -74,6 +74,7 @@ def export(model, name, suffix):
         return out
 
     with mx.exporter(f"{name}.{suffix}.mlxfn", my_export) as exporter:
+        # 100 is 1180 seconds, or  19.667 minutes
         for num_splits in range(1, 100):
             exporter(mx.zeros((2, num_splits, 512, 1024)))
 

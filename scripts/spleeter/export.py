@@ -65,67 +65,30 @@ def test(torch_model, mlx_model):
     assert torch.allclose(y0, y1, atol=1e-5), (y0 - y1).abs().max()
 
 
+def export(args, name):
+    state_dict = torch.load(f"./{name}.pt", weights_only=True, map_location="cpu")
+    torch_model = TorchUNet()
+    torch_model.load_state_dict(state_dict, strict=True)
+    torch_model.eval()
+
+    mlx_model = UNet()
+    mx.eval(mlx_model.parameters())
+
+    state_dict = replace(state_dict)
+
+    state_dict = tree_map(mx.array, state_dict)
+    mlx_model.update(tree_unflatten(list(state_dict.items())))
+
+    mlx_model.eval()
+    test(torch_model, mlx_model)
+
+
 @torch.no_grad()
 def main():
     args = get_args()
-
-    accompaniment_state_dict = torch.load(
-        "./accompaniment.pt", weights_only=True, map_location="cpu"
-    )
-    vocals_state_dict = torch.load("./vocals.pt", weights_only=True, map_location="cpu")
-
-    accompaniment = TorchUNet()
-    vocals = TorchUNet()
-
-    accompaniment.load_state_dict(accompaniment_state_dict, strict=True)
-    vocals.load_state_dict(vocals_state_dict, strict=True)
-
-    accompaniment.eval()
-    vocals.eval()
-
-    accompaniment_mlx = UNet()
-    vocals_mlx = UNet()
-
-    mx.eval(accompaniment_mlx.parameters())
-    mx.eval(vocals_mlx.parameters())
-
-    accompaniment_mlx_parameters = tree_flatten(accompaniment_mlx.parameters())
-    vocals_mlx_parameters = tree_flatten(vocals_mlx.parameters())
-
-    # transpose the conv.weight from (16, 2, 5, 5) to (16, 5, 5, 2)
-    # transpose the conv1.weight from (32, 16, 5, 5) to (32, 5, 5, 16)
-    # transpose the conv2.weight from (64, 32, 5, 5) to (64, 5, 5, 32)
-    # transpose the conv3.weight from (128, 64, 5, 5) to (128, 5, 5, 64)
-    # transpose the conv4.weight from (256, 128, 5, 5) to (256, 5, 5, 128)
-    # transpose the conv5.weight from (512, 256, 5, 5) to (512, 5, 5, 256)
-
-    # transpose the up1.weight from (512, 256, 5, 5) to (256, 5, 5, 512)
-    # transpose the up2.weight from (512, 128, 5, 5) to (128, 5, 5, 512)
-    # transpose the up3.weight from (256, 64, 5, 5) to (64, 5, 5, 256)
-    # transpose the up4.weight from (128, 32, 5, 5) to (32, 5, 5, 128)
-    # transpose the up5.weight from (64, 16, 5, 5) to (16, 5, 5, 64)
-    # transpose the up6.weight from (32, 1, 5, 5) to (1, 5, 5, 32)
-    # transpose the up7.weight from (2, 1, 4, 4) to (2, 4, 4, 1)
-    if False:
-        for k, v in accompaniment_mlx_parameters:
-            print(k, v.shape, k in accompaniment_state_dict)
-            if k in accompaniment_state_dict:
-                print(" ", accompaniment_state_dict[k].shape)
-
-    accompaniment_state_dict = replace(accompaniment_state_dict)
-    vocals_state_dict = replace(vocals_state_dict)
-
-    accompaniment_state_dict = tree_map(mx.array, accompaniment_state_dict)
-    vocals_state_dict = tree_map(mx.array, vocals_state_dict)
-
-    accompaniment_mlx.update(tree_unflatten(list(accompaniment_state_dict.items())))
-    vocals_mlx.update(tree_unflatten(list(vocals_state_dict.items())))
-
-    accompaniment_mlx.eval()
-    vocals_mlx.eval()
-
-    test(accompaniment, accompaniment_mlx)
-    test(vocals, vocals_mlx)
+    export(args, "accompaniment")
+    export(args, "vocals")
+    return
 
 
 if __name__ == "__main__":

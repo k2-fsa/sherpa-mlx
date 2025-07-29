@@ -34,6 +34,8 @@ def replace(state_dict):
     for k, v in state_dict.items():
         if k.endswith("num_batches_tracked"):
             continue
+        elif k == "up7.weight":
+            v = v.permute(0, 2, 3, 1)
         elif k.startswith("conv") and k.endswith(".weight") and len(v.shape) == 4:
             v = v.permute(0, 2, 3, 1)
         elif k.startswith("up") and k.endswith(".weight") and len(v.shape) == 4:
@@ -54,17 +56,13 @@ def test(torch_model, mlx_model):
     H = 512
     W = 1024
     x0 = torch.rand(num_audio_channels, num_splits, H, W)
-    x1 = x0.permute(1, 2, 3, 0)
-    x1 = mx.array(x1.numpy())
-
-    print(x0.shape, x1.shape, x0.sum(), x1.sum(), x0.mean(), x1.mean())
+    x1 = mx.array(x0.numpy())
 
     y0 = torch_model(x0)
     y1 = mlx_model(x1)
-    print("y0", y0.shape)
-    print("y1", y1.shape)
-    y1 = torch.from_numpy(np.array(y1)).permute(0, 3, 1, 2)
+    y1 = torch.from_numpy(np.array(y1))
     print("y0-y1", (y0 - y1).abs().max())
+    assert torch.allclose(y0, y1, atol=1e-5), (y0 - y1).abs().max()
 
 
 @torch.no_grad()
@@ -127,6 +125,7 @@ def main():
     vocals_mlx.eval()
 
     test(accompaniment, accompaniment_mlx)
+    test(vocals, vocals_mlx)
 
 
 if __name__ == "__main__":

@@ -44,15 +44,15 @@ class UNet(nn.Module):
 
         # output logit is False, so we need self.up7
         self.up7 = nn.Conv2d(1, 2, kernel_size=4, dilation=2, padding=3)
-        return
 
     def forward(self, x):
         """
         Args:
-          x: (num_splits, 512, 1024, num_audio_channels)
+          x: (num_audio_channels, num_splits, 512, 1024)
         Returns:
-          y: (num_splits, 512, 1024, num_audio_channels)
+          y: (num_audio_channels, num_splits, 512, 1024)
         """
+        x = mx.transpose(x, (1, 2, 3, 0))  # CNHW -> NHWC
         in_x = x
 
         # in_x is (3, 512, 1024, 2) = (T, 512, 1024, 2)
@@ -147,19 +147,18 @@ class UNet(nn.Module):
         up5 = up5[:, 1:-2, 1:-2, :]
         up5 = nn.relu(up5)
         batch11 = self.bn9(up5)
-        return batch11
 
-        merge5 = torch.cat([conv1, batch11], axis=1)  # (3, 32, 256, 512)
+        merge5 = mx.concatenate([conv1, batch11], axis=3)  # (3, 256, 512, 32)
 
         up6 = self.up6(merge5)
-        up6 = up6[:, :, 1:-2, 1:-2]
-        up6 = torch.nn.functional.relu(up6)
-        batch12 = self.bn10(up6)  # (3, 1, 512, 1024)  = (T, 1, 512, 1024)
+        up6 = up6[:, 1:-2, 1:-2, :]
+        up6 = nn.relu(up6)
+        batch12 = self.bn10(up6)  # (3, 512, 1024, 1)  = (T, 512, 1024, 1)
 
         up7 = self.up7(batch12)
-        up7 = torch.sigmoid(up7)  # (3, 2, 512, 1024)
+        up7 = mx.sigmoid(up7)  # (3, 2, 512, 1024)
 
         ans = up7 * in_x
-        return ans.permute(1, 0, 2, 3)
+        return mx.transpose(ans, (3, 0, 1, 2))  # NHWC -> CNHW
 
     __call__ = forward

@@ -147,7 +147,6 @@ class UNet(torch.nn.Module):
         up5 = up5[:, :, 1:-2, 1:-2]
         up5 = torch.nn.functional.relu(up5)
         batch11 = self.bn9(up5)
-        return batch11
 
         merge5 = torch.cat([conv1, batch11], axis=1)  # (3, 32, 256, 512)
 

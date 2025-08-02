@@ -5,13 +5,13 @@
 set -ex
 
 function install_deps() {
-  python3 -m pip install mlx mlx_lm parakeet-mlx kaldi-native-fbank soundfile librosa "numpy<2"
+  python3 -m pip install mlx mlx_lm parakeet-mlx kaldi-native-fbank soundfile librosa
 }
 
 function download_model_files() {
-  # curl -SL -O https://huggingface.co/csukuangfj/mlx-sense-voice-small-safe-tensors/resolve/main/sense-voice-small.safetensors
-  # curl -SL -O https://huggingface.co/csukuangfj/SenseVoiceSmall/resolve/main/am.mvn
-  # curl -SL -O https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main/tokens.txt
+  curl -SL -O https://huggingface.co/csukuangfj/mlx-sense-voice-small-safe-tensors/resolve/main/sense-voice-small.safetensors
+  curl -SL -O https://huggingface.co/csukuangfj/SenseVoiceSmall/resolve/main/am.mvn
+  curl -SL -O https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main/tokens.txt
   curl -SL -O https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main/test_wavs/zh.wav
   curl -SL -O https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main/test_wavs/en.wav
   curl -SL -O https://huggingface.co/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/main/test_wavs/ja.wav

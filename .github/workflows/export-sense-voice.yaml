@@ -4,7 +4,7 @@ name: export-sense-voice
 on:
   push:
     branches:
-      - export-sense-voice
+      - export-sense-voice-2
 
   workflow_dispatch:
 

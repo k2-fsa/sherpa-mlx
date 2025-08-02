@@ -23,6 +23,12 @@ def get_args():
         type=int,
         default=0,
     )
+
+    parser.add_argument(
+        "--wav",
+        type=str,
+        required=True,
+    )
     return parser.parse_args()
 
 
@@ -89,9 +95,10 @@ def compute_feat(
     )
 
     num_frames = features.shape[0]
-    if num_frames % 50 != 0:
-        pad = 50 - num_frames % 50
-        padding = np.zeros((pad, 80), dtype=np.float32)
+    v = 100
+    if num_frames % v != 0:
+        pad = v - num_frames % v
+        padding = np.ones((pad, 80), dtype=np.float32) * (-23)
         features = np.concatenate([features, padding])
 
     assert features.data.contiguous is True
@@ -111,7 +118,8 @@ def compute_feat(
 
 def main():
     args = get_args()
-    samples, sample_rate = load_audio("./zh.wav")
+    print(vars(args))
+    samples, sample_rate = load_audio(args.wav)
     if sample_rate != 16000:
         import librosa
 
@@ -144,8 +152,8 @@ def main():
     language = mx.array([0], dtype=mx.int32)  # auto
     text_norm = mx.array([14], dtype=mx.int32)  # with_itn
     logits = model(features, language, text_norm)[0]
-    print(logits.shape)
     idx = logits[0].argmax(axis=-1).tolist()
+    print("idx", idx)
 
     last = -1
     blank = 0

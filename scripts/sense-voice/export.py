@@ -65,9 +65,9 @@ def main():
     language = mx.array([0], dtype=mx.int32)
     text_norm = mx.array([14], dtype=mx.int32)
     with mx.exporter(f"model.{suffix}.mlxfn", my_export) as exporter:
-        for i in range(1, 100):
-            # 0.5 seconds interval, max 50 seconds
-            num_frames = int(i * 0.5 * 100)
+        for i in range(1, 30):
+            # 1 second interval, max 30 seconds
+            num_frames = int(i * 100)
             n = (num_frames - 7) // 6 + 1
             shape = (1, n, 560)
             x = mx.zeros(shape, dtype=mx.float32)

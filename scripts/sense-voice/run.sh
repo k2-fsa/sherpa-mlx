@@ -34,7 +34,7 @@ ls -lh *.mlxfn
 for w in zh.wav en.wav ja.wav ko.wav yue.wav; do
   for dtype in float32 float16 bfloat16; do
     for use_quant in 0 1; do
-      python3 ./test.py --dtype $dtype --use-quant $use_quant $w
+      python3 ./test.py --dtype $dtype --use-quant $use_quant --wav $w
     done
   done
 done

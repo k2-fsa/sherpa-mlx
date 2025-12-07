@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+#!/bin/zsh
 # Copyright    2025  Xiaomi Corp.        (authors: Fangjun Kuang)
 
 set -ex
 
 function install_deps() {
-  python3 -m pip install mlx mlx_lm parakeet-mlx kaldi-native-fbank soundfile librosa
+  python -m pip install mlx mlx_lm parakeet-mlx kaldi-native-fbank soundfile librosa
 }
 
 function download_model_files() {
@@ -21,19 +21,19 @@ function download_model_files() {
 install_deps
 download_model_files
 
-python3 ./export.py --dtype float32 --use-quant 0
-python3 ./export.py --dtype float16 --use-quant 0
-python3 ./export.py --dtype bfloat16 --use-quant 0
+python ./export.py --dtype float32 --use-quant 0
+python ./export.py --dtype float16 --use-quant 0
+python ./export.py --dtype bfloat16 --use-quant 0
 
-python3 ./export.py --dtype float32 --use-quant 1
-python3 ./export.py --dtype float16 --use-quant 1
-python3 ./export.py --dtype bfloat16 --use-quant 1
+python ./export.py --dtype float32 --use-quant 1
+python ./export.py --dtype float16 --use-quant 1
+python ./export.py --dtype bfloat16 --use-quant 1
 ls -lh *.mlxfn
 
 for w in zh.wav en.wav ja.wav ko.wav yue.wav; do
   for dtype in float32 float16 bfloat16; do
     for use_quant in 0 1; do
-      python3 ./test.py --dtype $dtype --use-quant $use_quant --wav $w
+      python ./test.py --dtype $dtype --use-quant $use_quant --wav $w
     done
   done
 done

@@ -52,7 +52,7 @@ def main():
     model.update(tree_unflatten(curr_weights))
 
     if args.use_quant:
-        model, config = quantize_model(model, {}, q_group_size=64, q_bits=4)
+        model, config = quantize_model(model, {}, group_size=64, bits=4)
         print("config", config)
 
     mx.eval(model.parameters())
